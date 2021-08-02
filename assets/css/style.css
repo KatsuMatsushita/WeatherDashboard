@@ -1,0 +1,23 @@
+.jumbotron {
+    text-align: center;
+    background-color: blue;
+    color: white;
+    border-radius: 0;
+    border-bottom: 10px solid black;
+  }
+
+.weatherCard {
+    text-align: left;
+    background-color: darkblue;
+    color: white;
+}
+
+.recentResultBtn {
+    color: black;
+    background-color: grey;
+}
+
+#searchBtn {
+    color: white;
+    background-color: cornflowerblue;
+}
