@@ -14,7 +14,8 @@ var forecastCards = document.querySelector("#forecastCards");
 function startSearch() {
     // the search button got clicked, and everything starts here
     citySearchTxt = document.querySelector("#searchText").value;
-    currentDay = moment().format("MM/DD/YYYY");
+    // original: currentDay = moment().format("MM/DD/YYYY");
+    currentDay = moment();
     if (citySearchTxt !== null) {
         // check that the city is a valid city by sending the query to the API
         cityName = citySearchTxt;
@@ -41,12 +42,11 @@ function makeForecasts(forecastObj, index) {
     var cardDateEl = document.createElement("p");
     var forecastWeather = document.createElement("p");
     var forecastDayIn = index + 1;
-    var forecastDay = moment().clone().add(forecastDayIn, "day").format("MM/DD/YYYY");
+    var forecastDay = currentDay.clone().add(forecastDayIn, "day").format("MM/DD/YYYY");
 
     /* this is to get the date a number of days(calculated by +1 to the index; since index starts at 0, +1 is tomorrow, 2 days from now, and so on)
      from currentDay. Using a JQuery clone method would have been easier, but I wanted to do it through vanilla JS */
     cardDateEl.textContent = forecastDay;
-    console.log(forecastDay);
     forecastWeather.textContent = forecastObj.weather.id;
 
     forecastCard.setAttribute("class", "col weatherCard");
@@ -73,7 +73,8 @@ function getWeatherData() {
         .then(data => {
             // the weather data has been returned, this is where the functions to display the data get called
             console.log(data);
-            currentCityDay.textContent = cityName + "    " + currentDay;
+            // original: currentCityDay.textContent = cityName + "    " + currentDay;
+            currentCityDay.textContent = cityName + "     " + currentDay.clone().format("MM/DD/YYYY");
             currentTemp.textContent = data.main.temp;
             currentHumidity.textContent = data.main.humidity;
             currentWind.textContent = data.wind.speed;
