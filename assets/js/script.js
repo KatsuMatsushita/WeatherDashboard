@@ -11,6 +11,12 @@ var currentHumidity = document.querySelector("#cityHumidity");
 var currentUV = document.querySelector("#cityUV");
 var forecastCards = document.querySelector("#forecastCards");
 
+// Need to create a new object constructor called weatherIcon so that multiple can be created and called later
+function WeatherIcon (URL, Weather) {
+    this.iconURL = URL;
+    this.iconWeather = Weather;
+};
+
 function startSearch() {
     // the search button got clicked, and everything starts here
     citySearchTxt = document.querySelector("#searchText").value;
@@ -32,7 +38,6 @@ function makeQuery(whichAPI, cityLat, cityLong) {
         queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&units=imperial&appid=" + apiKey;
     } else {
         queryURL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityLat + "&lon=" + cityLong + "&exclude=minutely,hourly,alerts&units=imperial&appid=" + apiKey;
-        console.log("from inside makeQuery: ", cityLat);
     }
 }
 
@@ -48,20 +53,85 @@ function makeForecasts(forecastObj, index) {
     var forecastDayIn = index + 1;
     // cloning the currentDay (which contains the moment.js object) is done to prevent mutability from changing the moment
     var forecastDay = currentDay.clone().add(forecastDayIn, "day").format("MM/DD/YYYY");
-
+    var forecastWeatherPNG = document.createElement("img");
+    var forecastWeatherIcon = getWeatherIcon(forecastObj.weather[0].id);
+    
     cardDateEl.textContent = forecastDay;
-    forecastWeather.textContent = forecastObj.weather[0].id;
-    forecastHumidity.textContent = forecastObj.humidity + "%";
-    forecastTemp.textContent = forecastObj.temp.day + "F";
-    forecastWind.textContent = forecastObj.wind_speed + "MPH";
+    
+    forecastHumidity.textContent = "Humidity: " + forecastObj.humidity + "%";
+    forecastTemp.textContent = "Temp: " + forecastObj.temp.day + "F";
+    forecastWind.textContent = "Wind: " + forecastObj.wind_speed + "MPH";
 
+    // this is to create the img element for the weather forecast
+    forecastWeatherPNG.setAttribute("src", forecastWeatherIcon.iconURL);
+    forecastWeatherPNG.setAttribute("alt", forecastWeatherIcon.iconWeather);
+
+    // this is where the card starts being put together by appending each part
     forecastCard.setAttribute("class", "col weatherCard");
+    forecastWeather.appendChild(forecastWeatherPNG);
     forecastCard.appendChild(cardDateEl);
     forecastCard.appendChild(forecastWeather);
     forecastCard.appendChild(forecastTemp);
     forecastCard.appendChild(forecastHumidity);
     forecastCard.appendChild(forecastWind);
     forecastCards.appendChild(forecastCard);
+}
+
+function getWeatherIcon(weatherID){
+    var iconURLPre = "https://openweathermap.org/img/wn/";
+    var iconURLStr = "";
+    var iconURLObj = new WeatherIcon("", "");
+
+    if (weatherID <= 299 && weatherID >= 200){
+        iconURLStr = iconURLPre + "11d.png";
+        iconURLObj.iconURL = iconURLStr;
+        iconURLObj.iconWeather = "Thunderstorm";
+    } else if (weatherID <= 399 && weatherID >= 300){
+        iconURLStr = iconURLPre + "09d.png";
+        iconURLObj.iconURL = iconURLStr;
+        iconURLObj.iconWeather = "Drizzle";
+    } else if (weatherID == 511){
+        iconURLStr = iconURLPre + "13d.png";
+        iconURLObj.iconURL = iconURLStr;
+        iconURLObj.iconWeather = "Freezing Rain";
+    } else if (weatherID <= 504 && weatherID >= 500){
+        iconURLStr = iconURLPre + "10d.png";
+        iconURLObj.iconURL = iconURLStr;
+        iconURLObj.iconWeather = "Rain";
+    } else if (weatherID > 511 && weatherID < 550){
+        iconURLSTR = iconURLPre + "09d.png";
+        iconURLObj.iconURL = iconURLStr;
+        iconURLObj.iconWeather = "Shower Rain";
+    } else if (weatherID <= 622 && weatherID >= 600){
+        iconURLStr = iconURLPre + "13d.png";
+        iconURLObj.iconURL = iconURLStr;
+        iconURLObj.iconWeather = "Snow";
+    } else if (weatherID <= 781 && weatherID >= 700){
+        iconURLStr = iconURLPre + "50d.png";
+        iconURLObj.iconURL = iconURLStr;
+        iconURLObj.iconWeather = "Haze";
+    } else if (weatherID == 800){
+        iconURLStr = iconURLPre + "01d.png";
+        iconURLObj.iconURL = iconURLStr;
+        iconURLObj.iconWeather = "Clear";
+    } else if (weatherID == 801){
+        iconURLStr = iconURLPre + "02d.png";
+        iconURLObj.iconURL = iconURLStr;
+        iconURLObj.iconWeather = "Few Clouds";
+    } else if (weatherID == 802){
+        iconURLStr = iconURLPre + "03d.png";
+        iconURLObj.iconURL = iconURLStr;
+        iconURLObj.iconWeather = "Scattered Clouds";
+    } else if (weatherID == 803){
+        iconURLStr = iconURLPre + "04d.png";
+        iconURLObj.iconURL = iconURLStr;
+        iconURLObj.iconWeather = "Broken Clouds";
+    } else {
+        iconURLStr = iconURLPre + "04d.png";
+        iconURLObj.iconURL = iconURLStr;
+        iconURLObj.iconWeather = "Overcast Clouds";
+    }
+    return iconURLObj;
 }
 
 function getWeatherData() {
@@ -84,9 +154,9 @@ function getWeatherData() {
             console.log(data);
             // cloning the currentDay (which contains the moment.js object) is done to prevent mutability from changing the moment
             currentCityDay.textContent = cityName + "     " + currentDay.clone().format("MM/DD/YYYY");
-            currentTemp.textContent = data.main.temp;
-            currentHumidity.textContent = data.main.humidity;
-            currentWind.textContent = data.wind.speed;
+            currentTemp.textContent = data.main.temp + "F";
+            currentHumidity.textContent = data.main.humidity + "%";
+            currentWind.textContent = data.wind.speed + "MPH";
 
             cityLat = data.coord.lat;
             cityLon = data.coord.lon;
