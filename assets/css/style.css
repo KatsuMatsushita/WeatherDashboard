@@ -10,6 +10,7 @@
     text-align: left;
     background-color: darkblue;
     color: white;
+    border-radius: 5px;
 }
 
 .recentResultBtn {
@@ -20,4 +21,19 @@
 #searchBtn {
     color: white;
     background-color: cornflowerblue;
+}
+
+.UVI-min {
+    background-color:green;
+    color: white
+}
+
+.UVI-mod {
+    background-color: orange;
+    color: white;
+}
+
+.UVI-sev {
+    background-color: crimson;
+    color: white;
 }
