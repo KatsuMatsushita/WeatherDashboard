@@ -40,9 +40,13 @@ function makeForecasts(forecastObj, index) {
     var forecastCard = document.createElement("div");
     var cardDateEl = document.createElement("p");
     var forecastWeather = document.createElement("p");
-    var forecastDay = index + 1;
+    var forecastDayIn = index + 1;
+    var forecastDay = moment().clone().add(forecastDayIn, "day").format("MM/DD/YYYY");
 
-    cardDateEl.textContent = currentDay.clone().add(forecastDay, "day");
+    /* this is to get the date a number of days(calculated by +1 to the index; since index starts at 0, +1 is tomorrow, 2 days from now, and so on)
+     from currentDay. Using a JQuery clone method would have been easier, but I wanted to do it through vanilla JS */
+    cardDateEl.textContent = forecastDay;
+    console.log(forecastDay);
     forecastWeather.textContent = forecastObj.weather.id;
 
     forecastCard.setAttribute("class", "col weatherCard");
