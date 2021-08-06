@@ -41,17 +41,26 @@ function makeForecasts(forecastObj, index) {
     var forecastCard = document.createElement("div");
     var cardDateEl = document.createElement("p");
     var forecastWeather = document.createElement("p");
+    var forecastHumidity = document.createElement("p");
+    var forecastTemp = document.createElement("p");
+    var forecastWind = document.createElement("p");
+    // this is to get the date a number of days(calculated by +1 to the index; since index starts at 0, +1 is tomorrow, 2 days from now, and so on)
     var forecastDayIn = index + 1;
+    // cloning the currentDay (which contains the moment.js object) is done to prevent mutability from changing the moment
     var forecastDay = currentDay.clone().add(forecastDayIn, "day").format("MM/DD/YYYY");
 
-    /* this is to get the date a number of days(calculated by +1 to the index; since index starts at 0, +1 is tomorrow, 2 days from now, and so on)
-     from currentDay. Using a JQuery clone method would have been easier, but I wanted to do it through vanilla JS */
     cardDateEl.textContent = forecastDay;
-    forecastWeather.textContent = forecastObj.weather.id;
+    forecastWeather.textContent = forecastObj.weather[0].id;
+    forecastHumidity.textContent = forecastObj.humidity + "%";
+    forecastTemp.textContent = forecastObj.temp.day + "F";
+    forecastWind.textContent = forecastObj.wind_speed + "MPH";
 
     forecastCard.setAttribute("class", "col weatherCard");
     forecastCard.appendChild(cardDateEl);
     forecastCard.appendChild(forecastWeather);
+    forecastCard.appendChild(forecastTemp);
+    forecastCard.appendChild(forecastHumidity);
+    forecastCard.appendChild(forecastWind);
     forecastCards.appendChild(forecastCard);
 }
 
@@ -73,17 +82,14 @@ function getWeatherData() {
         .then(data => {
             // the weather data has been returned, this is where the functions to display the data get called
             console.log(data);
-            // original: currentCityDay.textContent = cityName + "    " + currentDay;
+            // cloning the currentDay (which contains the moment.js object) is done to prevent mutability from changing the moment
             currentCityDay.textContent = cityName + "     " + currentDay.clone().format("MM/DD/YYYY");
             currentTemp.textContent = data.main.temp;
             currentHumidity.textContent = data.main.humidity;
             currentWind.textContent = data.wind.speed;
-            //currentUV.value(data.);
+
             cityLat = data.coord.lat;
             cityLon = data.coord.lon;
-            //console.log("lat and long: ");
-            //console.log(cityLat);
-            //console.log(cityLon);
 
             // takes the lat and lon from the above call and uses the One Call API for the UV Index and Forecast
             makeQuery(2, cityLat, cityLon);
