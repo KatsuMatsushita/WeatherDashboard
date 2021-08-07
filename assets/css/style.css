@@ -18,6 +18,10 @@
     background-color: grey;
 }
 
+.recentResultDiv {
+    border-radius: 5px;
+}
+
 #searchBtn {
     color: white;
     background-color: cornflowerblue;

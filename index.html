@@ -17,16 +17,17 @@
       <h1 class="display-3">Weather Dashboard</h1>
     </header>
     <div class="container-fluid">
-        big container
         <div class="row">
             <div class="col border"> <!-- Sidebar that includes the search and recent results -->
                 <h3>Search for a City</h3>
                 <input type="text" id="searchText" placeholder="East Stroudsburg">
                 <button id="searchBtn">Search</button>
+                <hr>
                 <aside>
                     <!-- hook recent results here -->
-                    <div class="container" id="recentResultsList">
-                        <div class="row"><button class="recentResultBtn">recent result</button></div>
+                    <div class="container d-grid gap-3" id="recentResultsList">
+                        <!-- example of a recent search button 
+                        <div class="row"><button class="recentResultBtn">recent result</button></div> -->
                     </div>
                 </aside>
             </div>

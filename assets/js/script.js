@@ -10,6 +10,8 @@ var currentWind = document.querySelector("#cityWind");
 var currentHumidity = document.querySelector("#cityHumidity");
 var currentUV = document.querySelector("#cityUV");
 var forecastCards = document.querySelector("#forecastCards");
+var recentResultsCont = document.querySelector("#recentResultsList");
+var fromStorage = [];
 
 // Need to create a new object constructor called weatherIcon so that multiple can be created and called later
 function WeatherIcon (URL, Weather) {
@@ -17,17 +19,49 @@ function WeatherIcon (URL, Weather) {
     this.iconWeather = Weather;
 };
 
-function startSearch() {
+function restoreRecent() {
+        // get the list of recent searches out of local storage
+        fromStorage = JSON.parse(localStorage.getItem("storedRecent"));
+        if (fromStorage !== null) {
+            fromStorage.forEach(function(recentCity, index){
+                createRecentBtn(recentCity);
+            })
+        } else {
+            console.log("Nothing in local storage");
+        };
+}
+
+function clickSearch() {
     // the search button got clicked, and everything starts here
     citySearchTxt = document.querySelector("#searchText").value;
+    startSearch (citySearchTxt);
+}
+
+function startSearch(citySearchTxt) {
     // original: currentDay = moment().format("MM/DD/YYYY");
     currentDay = moment();
+    // check that the city is a valid city by sending the query to the API
     if (citySearchTxt !== null) {
-        // check that the city is a valid city by sending the query to the API
+        if (fromStorage == null){
+        // Now that we validated that there is text in the Search box, create a Recent button for it
+        createRecentBtn(citySearchTxt);
+        // Stores the recent search city
+        fromStorage = [citySearchTxt];
+        localStorage.setItem("storedRecent", JSON.stringify(fromStorage));
+        } else if (!fromStorage.includes(citySearchTxt)) {
+            createRecentBtn(citySearchTxt);
+            // Stores the recent search city
+            fromStorage.push(citySearchTxt);
+            localStorage.setItem("storedRecent", JSON.stringify(fromStorage));
+        };
+        // replaces any spaces with %20 so it can be sent through fetch
+        citySearchTxt = citySearchTxt.replace(" ", "%20");
+        // cityName is a global variable because it is used elsewhere
         cityName = citySearchTxt;
         makeQuery(1);
-        getWeatherData();
-        
+        getWeatherData(); 
+    } else {
+        alert("The Search box is empty");
     }
 }
 
@@ -55,7 +89,7 @@ function makeForecasts(forecastObj, index) {
     var forecastDay = currentDay.clone().add(forecastDayIn, "day").format("MM/DD/YYYY");
     var forecastWeatherPNG = document.createElement("img");
     var forecastWeatherIcon = getWeatherIcon(forecastObj.weather[0].id);
-    
+
     cardDateEl.textContent = forecastDay;
     
     forecastHumidity.textContent = "Humidity: " + forecastObj.humidity + "%";
@@ -75,6 +109,15 @@ function makeForecasts(forecastObj, index) {
     forecastCard.appendChild(forecastHumidity);
     forecastCard.appendChild(forecastWind);
     forecastCards.appendChild(forecastCard);
+}
+
+function deleteForecasts() {
+    // example copied from https://www.geeksforgeeks.org/remove-all-the-child-elements-of-a-dom-node-in-javascript/
+    var child = forecastCards.lastElementChild; 
+        while (child) {
+            forecastCards.removeChild(child);
+            child = forecastCards.lastElementChild;
+        }
 }
 
 function getWeatherIcon(weatherID){
@@ -151,9 +194,8 @@ function getWeatherData() {
         })
         .then(data => {
             // the weather data has been returned, this is where the functions to display the data get called
-            console.log(data);
             // cloning the currentDay (which contains the moment.js object) is done to prevent mutability from changing the moment
-            currentCityDay.textContent = cityName + "     " + currentDay.clone().format("MM/DD/YYYY");
+            currentCityDay.textContent = data.name + "     " + currentDay.clone().format("MM/DD/YYYY");
             currentTemp.textContent = data.main.temp + "F";
             currentHumidity.textContent = data.main.humidity + "%";
             currentWind.textContent = data.wind.speed + "MPH";
@@ -180,15 +222,35 @@ function getWeatherData() {
                         // UV Index must be 8 or higher, and therefore Severe
                         currentUV.setAttribute("class", "UVI-sev");
                     };
+                    // delete the forecast cards of any previous search
+                    deleteForecasts();
                     // populate the forecast
                     for (var i=0; i < 5; i++) {
                         makeForecasts(cityData.daily[i], i);
                     };
                 })
         })
-
-       
-    
 }
 
-searchBtn.addEventListener("click", startSearch);
+function createRecentBtn (recentCityName) {
+    // this creates a new Recent Button
+    var recentEl = document.createElement("div");
+    var recentBtn = document.createElement("button");
+
+    recentEl.setAttribute("class", "row recentResultDiv");
+    recentBtn.innerText = recentCityName;
+    recentBtn.setAttribute("class", "recentResultBtn");
+    recentBtn.setAttribute("onclick", "clickRecentBtn(this)");
+
+    // this appends the button to the list item, then the list item to the Recent List
+    recentEl.appendChild(recentBtn);
+    recentResultsCont.appendChild(recentEl);
+};
+
+function clickRecentBtn(clickedBtn) {
+    var searchedName = clickedBtn.innerText;
+    startSearch(searchedName);
+};
+
+restoreRecent();
+searchBtn.addEventListener("click", clickSearch);
