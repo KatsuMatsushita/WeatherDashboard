@@ -6,6 +6,10 @@
     border-bottom: 10px solid black;
   }
 
+h5 {
+    display: inline;
+}
+
 .weatherCard {
     text-align: left;
     background-color: darkblue;

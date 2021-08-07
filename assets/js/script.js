@@ -9,6 +9,7 @@ var currentTemp = document.querySelector("#cityTemp");
 var currentWind = document.querySelector("#cityWind");
 var currentHumidity = document.querySelector("#cityHumidity");
 var currentUV = document.querySelector("#cityUV");
+var currentWeathIcon = document.querySelector("#currentWeather");
 var forecastCards = document.querySelector("#forecastCards");
 var recentResultsCont = document.querySelector("#recentResultsList");
 var fromStorage = [];
@@ -199,6 +200,10 @@ function getWeatherData() {
             currentTemp.textContent = data.main.temp + "F";
             currentHumidity.textContent = data.main.humidity + "%";
             currentWind.textContent = data.wind.speed + "MPH";
+
+            var currentWeatherIcon = getWeatherIcon(data.weather.id);
+            currentWeathIcon.setAttribute("src", currentWeatherIcon.iconURL);
+            currentWeathIcon.setAttribute("alt", currentWeatherIcon.iconWeather);
 
             cityLat = data.coord.lat;
             cityLon = data.coord.lon;
